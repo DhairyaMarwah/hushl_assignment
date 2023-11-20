@@ -7,6 +7,7 @@ export const datingProfiles = [
     age: 22,
     location: "London, UK",
     gender: "female",
+    
     height: "5'4",
     education: "Bachelors in Computer Science",
     job: "Software Engineer",

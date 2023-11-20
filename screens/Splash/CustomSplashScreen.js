@@ -4,7 +4,7 @@ const CustomSplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/animation/splash.gif")} />
+      <Image source={require("../../assets/animation/splash.gif")} />
     </View>
   );
 };

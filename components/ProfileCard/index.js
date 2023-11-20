@@ -3,10 +3,16 @@ import { Animated, StyleSheet, View, Text } from "react-native";
 
 import { ACTION_OFFSET } from "../../utils/constants";
 
-import { Container, Image, Name, Gradient, Like, Nope } from "./styles";
+import { Container, Image, Like, Nope } from "./styles";
 import AppIcons from "../../assets/AppIcons";
 
-export default function Card({ item, isFirst, swipe, tiltSign, ...rest }) {
+export default function ProfileCard({
+  item,
+  isFirst,
+  swipe,
+  tiltSign,
+  ...rest
+}) {
   const rotate = Animated.multiply(swipe.x, tiltSign).interpolate({
     inputRange: [-ACTION_OFFSET, 0, ACTION_OFFSET],
     outputRange: ["8deg", "0deg", "-8deg"],

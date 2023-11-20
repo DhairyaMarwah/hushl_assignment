@@ -3,16 +3,16 @@ import {
   Animated,
   PanResponder,
   StyleSheet,
-  View,
-  TouchableOpacity,
+  View, 
 } from "react-native";
-import { ACTION_OFFSET, CARD } from "../utils/constants";
-import { datingProfiles as datingProfilesObj } from "./data";
-import { Container } from "./styles";
-import Card from "../components/Card";
-import AppIcons from "../assets/AppIcons";
-import BookMark from "../modals/BookMark";
-import Match from "../modals/Match";
+import { ACTION_OFFSET, CARD } from "../../utils/constants";
+import { datingProfiles as datingProfilesObj } from "../../data/data";
+import { Container } from "../../styles/styles";
+import AppIcons from "../../assets/AppIcons";
+import BookMark from "../../modals/BookMark";
+import Match from "../../modals/Match";
+import BottomBar from "../../components/BottomBar/BottomBar";
+import ProfileCard from "../../components/ProfileCard";
 
 export default function Home() {
   const swipe = useRef(new Animated.ValueXY()).current;
@@ -125,17 +125,7 @@ export default function Home() {
   }, [datingProfilesObj[currentProfileIndex]?.liked, currentswipe]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        backgroundColor: "#fff",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <View style={styles.HomeView}>
       <BookMark
         isVisible={isModalVisible}
         toggleModal={toggleModal}
@@ -146,13 +136,14 @@ export default function Home() {
         <Match
           isVisible={isMatchModalVisible}
           toggleModal={toggleMatchModal}
-          img={datingProfilesObj[currentProfileIndex-1].bookmark}
+          img={datingProfilesObj[currentProfileIndex - 1].bookmark}
         />
       )}
 
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>
+
       <Container>
         {datingProfiles
           .map((item, index) => {
@@ -160,7 +151,7 @@ export default function Home() {
             const panHandlers = isFirst ? panResponder.panHandlers : {};
 
             return (
-              <Card
+              <ProfileCard
                 key={item.id}
                 item={item}
                 isFirst={isFirst}
@@ -171,38 +162,8 @@ export default function Home() {
             );
           })
           .reverse()}
-        <View style={styles.BottomBar}>
-          <View style={styles.BottomBarContainer}>
-            <View style={styles.BottomBarContainerLeft}>
-              <TouchableOpacity
-                onPress={() => handleChoise(1)}
-                style={styles.BottomBarIcon}
-              >
-                <AppIcons.Like />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleChoise(-1)}
-                style={styles.BottomBarIcon}
-              >
-                <AppIcons.Dislike />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleChoise(1)}
-                style={styles.BottomBarIcon}
-              >
-                <AppIcons.SuperLike />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.BottomBarContainerRight}>
-              <TouchableOpacity
-                onPress={() => handleSave()}
-                style={styles.BottomBarIcon}
-              >
-                <AppIcons.Save />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+
+        <BottomBar handleChoise={handleChoise} handleSave={handleSave} />
       </Container>
     </View>
   );
@@ -215,32 +176,13 @@ const styles = StyleSheet.create({
     left: 30,
     zIndex: 1000,
   },
-  BottomBar: {
-    position: "absolute",
-    // top: 90,
-    bottom: 25,
+  HomeView: {
+    flex: 1,
     width: "100%",
-    paddingHorizontal: 30,
-    zIndex: 1000,
-  },
-  BottomBarContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    gap: 10,
-  },
-  BottomBarContainerLeft: {
-    borderRadius: 40,
-    backgroundColor: "rgba(217, 217, 217, 0.25)",
-    padding: 9,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "77%",
-  },
-  BottomBarContainerRight: {
-    borderRadius: 40,
-    backgroundColor: "rgba(217, 217, 217, 0.25)",
-    padding: 9,
-    width: "23%",
+    height: "100%",
+    position: "relative",
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import AppIcons from "../assets/AppIcons";
+import AppIcons from "../../assets/AppIcons";
 import { useNavigation } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 
@@ -53,7 +53,7 @@ export default function GetStarted() {
         duration={1500}
         delay={500} // Adjust the delay as needed
       >
-        <Image source={require("../assets/Backgrounds/ImgAnim.png")} />
+        <Image source={require("../../assets/Backgrounds/ImgAnim.png")} />
       </Animatable.View>
     </LinearGradient>
   );

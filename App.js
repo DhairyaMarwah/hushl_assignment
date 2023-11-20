@@ -10,9 +10,9 @@ import {
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
 import * as Font from "expo-font";
-import Home from "./screens/Home";
-import CustomSplashScreen from "./screens/CustomSplashScreen";
-import GetStarted from "./screens/GetStarted";
+import Home from "./screens/screenRoutes/Home";
+import CustomSplashScreen from "./screens/Splash/CustomSplashScreen";
+import GetStarted from "./screens/screenRoutes/GetStarted";
 const Stack = createNativeStackNavigator();
 
 const screens = [
