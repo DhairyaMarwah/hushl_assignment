@@ -1,14 +1,6 @@
-import { NavigationContainer, useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import {
-  useFonts,
-  Poppins_300Light,
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from "@expo-google-fonts/poppins";
 import * as Font from "expo-font";
 import Home from "./screens/screenRoutes/Home";
 import CustomSplashScreen from "./screens/Splash/CustomSplashScreen";
@@ -25,13 +17,7 @@ const screens = [
 ];
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    Poppins_300Light,
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-  });
+  const [splashVisible, setSplashVisible] = useState(true);
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -41,7 +27,7 @@ export default function App() {
       "aeonik-regular": require("./assets/fonts/Aeonik-Regular.otf"),
     });
   };
-  const [splashVisible, setSplashVisible] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplashVisible(false);

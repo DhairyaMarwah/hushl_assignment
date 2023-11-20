@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  PanResponder,
-  StyleSheet,
-  View, 
-} from "react-native";
+import { Animated, PanResponder, StyleSheet, View } from "react-native";
 import { ACTION_OFFSET, CARD } from "../../utils/constants";
 import { datingProfiles as datingProfilesObj } from "../../data/data";
 import { Container } from "../../styles/styles";
@@ -16,10 +11,24 @@ import ProfileCard from "../../components/ProfileCard";
 
 export default function Home() {
   const swipe = useRef(new Animated.ValueXY()).current;
-  const [currentswipe, setCurrentswipe] = useState("");
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [datingProfiles, setdatingProfiles] = useState(datingProfilesObj);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+  const [currentSwipe, setCurrentSwipe] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isMatchModalVisible, setMatchModalVisible] = useState(false);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (e, { dx, dy, y0 }) => {
+        tiltSign.setValue(y0 > CARD.CARD_HEIGHT / 2 ? 1 : -1);
+        swipe.setValue({ x: dx, y: dy });
+      },
+      onPanResponderRelease: (e, { dx, dy }) =>
+        handlePanResponderRelease(dx, dy),
+    })
+  ).current;
 
   useEffect(() => {
     if (datingProfiles.length === 0) {
@@ -27,49 +36,45 @@ export default function Home() {
     }
   }, [datingProfiles]);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderMove: (e, { dx, dy, y0 }) => {
-        // 1: sentido horário | -1: sentido anti-horário
-        tiltSign.setValue(y0 > CARD.CARD_HEIGHT / 2 ? 1 : -1);
-        swipe.setValue({ x: dx, y: dy });
-      },
-      onPanResponderRelease: (e, { dx, dy }) => {
-        const direction = Math.sign(dx);
-        const userAction = Math.abs(dx) > ACTION_OFFSET;
+  useEffect(() => {
+    if (isModalVisible) {
+      setTimeout(() => {
+        setModalVisible(false);
+      }, 3000);
+    }
+  }, [isModalVisible]);
 
-        if (userAction) {
-          Animated.timing(swipe, {
-            duration: 200,
-            toValue: {
-              x: direction * CARD.CARD_OUT_WIDTH,
-              y: dy,
-            },
-            useNativeDriver: true,
-          }).start(() => {
-            if (direction === 1) {
-              console.log("liked");
-              setCurrentswipe("liked");
-            } else {
-              console.log("not liked");
-              setCurrentswipe("notliked");
-            }
-            transitionNext();
-          });
-        } else {
-          Animated.spring(swipe, {
-            friction: 5,
-            toValue: {
-              x: 0,
-              y: 0,
-            },
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
+  useEffect(() => {
+    handleMatchCheck();
+  }, [datingProfilesObj[currentProfileIndex]?.liked, currentSwipe]);
+
+  const handlePanResponderRelease = (dx, dy) => {
+    const direction = Math.sign(dx);
+    const userAction = Math.abs(dx) > ACTION_OFFSET;
+
+    if (userAction) {
+      Animated.timing(swipe, {
+        duration: 200,
+        toValue: {
+          x: direction * CARD.CARD_OUT_WIDTH,
+          y: dy,
+        },
+        useNativeDriver: true,
+      }).start(() => {
+        setCurrentSwipe(direction === 1 ? "liked" : "notliked");
+        transitionNext();
+      });
+    } else {
+      Animated.spring(swipe, {
+        friction: 5,
+        toValue: {
+          x: 0,
+          y: 0,
+        },
+        useNativeDriver: true,
+      }).start();
+    }
+  };
 
   const transitionNext = useCallback(() => {
     setdatingProfiles((prevState) => {
@@ -93,8 +98,6 @@ export default function Home() {
   const handleSave = () => {
     setModalVisible(true);
   };
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isMatchModalVisible, setMatchModalVisible] = useState(false);
 
   const toggleMatchModal = () => {
     setMatchModalVisible(!isMatchModalVisible);
@@ -103,26 +106,15 @@ export default function Home() {
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-  useEffect(() => {
-    if (isModalVisible) {
-      setTimeout(() => {
-        setModalVisible(false);
-      }, 3000);
-    }
-  }, [isModalVisible]);
 
-  useEffect(() => {
-    if (
-      datingProfilesObj[currentProfileIndex]?.liked === true &&
-      currentswipe === "liked"
-    ) {
-      setCurrentswipe("");
+  const handleMatchCheck = () => {
+    const liked = datingProfilesObj[currentProfileIndex]?.liked;
+    if (liked === true && currentSwipe === "liked") {
       console.log("match with " + datingProfilesObj[currentProfileIndex]?.name);
       setMatchModalVisible(true);
-    } else {
-      setCurrentswipe("");
     }
-  }, [datingProfilesObj[currentProfileIndex]?.liked, currentswipe]);
+    setCurrentSwipe("");
+  };
 
   return (
     <View style={styles.HomeView}>

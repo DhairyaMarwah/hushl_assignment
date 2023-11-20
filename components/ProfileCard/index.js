@@ -41,8 +41,6 @@ export default function ProfileCard({
       {...rest}
     >
       <Image source={item.source} />
-      {/* <Gradient />
-      <Name>{name}</Name> */}
       <View style={styles.profileCardInfo}>
         <View style={styles.ProfileLocation}>
           <View style={styles.ProfileLocationIcon}>
