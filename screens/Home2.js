@@ -12,6 +12,7 @@ import { Container } from "./styles";
 import Card from "../components/Card";
 import AppIcons from "../assets/AppIcons";
 import BookMark from "../modals/BookMark";
+import Match from "../modals/Match";
 
 export default function Home2() {
   const swipe = useRef(new Animated.ValueXY()).current;
@@ -83,6 +84,11 @@ export default function Home2() {
     setModalVisible(true);
   };
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isMatchModalVisible, setMatchModalVisible] = useState(true);
+
+  const toggleMatchModal = () => {
+    setMatchModalVisible(!isMatchModalVisible);
+  };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -119,6 +125,7 @@ export default function Home2() {
         name={datingProfilesObj[currentProfileIndex]?.name}
         // data={datingProfiles[currentProfileIndex]}
       />
+      <Match isVisible={isMatchModalVisible} toggleModal={toggleMatchModal} />
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>

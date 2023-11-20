@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Image,TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import AppIcons from "../assets/AppIcons";
@@ -6,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Animatable from "react-native-animatable";
 
 export default function GetStarted() {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   return (
     <LinearGradient
       style={styles.ContainerBg}
@@ -31,8 +38,9 @@ export default function GetStarted() {
           <Text style={styles.GetStartedHeaderWhite}> GlowUp Date</Text>
         </Text>
         <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
-        style={styles.getstartedbutton}>
+          onPress={() => navigation.navigate("Home")}
+          style={styles.getstartedbutton}
+        >
           <Text style={styles.getstartedbuttonText}>Get Started</Text>
           <View style={styles.getstartedbuttonIcon}>
             <AppIcons.ButtonArrow />

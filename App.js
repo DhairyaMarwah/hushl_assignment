@@ -14,6 +14,7 @@ import Home from "./screens/Home";
 import CustomSplashScreen from "./screens/CustomSplashScreen";
 import GetStarted from "./screens/GetStarted";
 import Home2 from "./screens/Home2";
+import Match from "./screens/Match";
 const Stack = createNativeStackNavigator();
 
 const screens = [
@@ -23,6 +24,7 @@ const screens = [
     options: { headerShown: false },
   },
   { name: "Home", component: Home2, options: { headerShown: false } },
+  { name: "Match", component: Match, options: { headerShown: false } },
 ];
 
 export default function App() {
