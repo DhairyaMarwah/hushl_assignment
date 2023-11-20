@@ -12,7 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState, useCallback, useEffect } from "react";
 import AppIcons from "../assets/AppIcons";
 
-export default function Match({ isVisible, toggleModal }) {
+export default function Match({ isVisible, toggleModal, img }) {
   const navigation = useNavigation();
   const lottieRef = useCallback((node) => {
     if (node) {
@@ -64,7 +64,7 @@ export default function Match({ isVisible, toggleModal }) {
                   >
                     <View style={styles.matchProfile1}>
                       <Image
-                        source={require("../assets/DatingProfiles/Profile2Bookmark.png")}
+                        source={require("../assets/DatingProfiles/CurrentUser.png")}
                         style={styles.matchProfile}
                       />
                     </View>
@@ -75,7 +75,7 @@ export default function Match({ isVisible, toggleModal }) {
                   >
                     <View style={styles.matchProfile2}>
                       <Image
-                        source={require("../assets/DatingProfiles/Profile4Bookmark.png")}
+                        source={img}
                         style={styles.matchProfile}
                       />
                     </View>

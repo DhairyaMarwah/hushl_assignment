@@ -16,6 +16,7 @@ import Match from "../modals/Match";
 
 export default function Home2() {
   const swipe = useRef(new Animated.ValueXY()).current;
+  const [currentswipe, setCurrentswipe] = useState("");
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [datingProfiles, setdatingProfiles] = useState(datingProfilesObj);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
@@ -46,7 +47,16 @@ export default function Home2() {
               y: dy,
             },
             useNativeDriver: true,
-          }).start(transitionNext);
+          }).start(() => {
+            if (direction === 1) {
+              console.log("liked");
+              setCurrentswipe("liked");
+            } else {
+              console.log("not liked");
+              setCurrentswipe("notliked");
+            }
+            transitionNext();
+          });
         } else {
           Animated.spring(swipe, {
             friction: 5,
@@ -84,7 +94,7 @@ export default function Home2() {
     setModalVisible(true);
   };
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isMatchModalVisible, setMatchModalVisible] = useState(true);
+  const [isMatchModalVisible, setMatchModalVisible] = useState(false);
 
   const toggleMatchModal = () => {
     setMatchModalVisible(!isMatchModalVisible);
@@ -101,11 +111,19 @@ export default function Home2() {
     }
   }, [isModalVisible]);
 
-  console.log(
-    "currentProfileIndex",
-    currentProfileIndex,
-    datingProfilesObj[currentProfileIndex]
-  );
+  useEffect(() => {
+    if (
+      datingProfilesObj[currentProfileIndex]?.liked === true &&
+      currentswipe === "liked"
+    ) {
+      setCurrentswipe("");
+      console.log("match with " + datingProfilesObj[currentProfileIndex]?.name);
+      setMatchModalVisible(true);
+    } else {
+      setCurrentswipe("");
+    }
+  }, [datingProfilesObj[currentProfileIndex]?.liked, currentswipe]);
+
   return (
     <View
       style={{
@@ -123,9 +141,15 @@ export default function Home2() {
         toggleModal={toggleModal}
         img={datingProfilesObj[currentProfileIndex]?.bookmark}
         name={datingProfilesObj[currentProfileIndex]?.name}
-        // data={datingProfiles[currentProfileIndex]}
       />
-      <Match isVisible={isMatchModalVisible} toggleModal={toggleMatchModal} />
+      {isMatchModalVisible && (
+        <Match
+          isVisible={isMatchModalVisible}
+          toggleModal={toggleMatchModal}
+          img={datingProfilesObj[currentProfileIndex-1].bookmark}
+        />
+      )}
+
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>

@@ -26,7 +26,7 @@ export default function BookMark({ isVisible, toggleModal, img,name }) {
             <View style={styles.modalFlex}>
               <Image source={img} style={styles.BookMarkImg} />
               <Text style={styles.BookMarkText}>
-                Successfully saved {name.split(" ")[0]} Profile {"\n"}
+                Successfully saved {name?.split(" ")[0]} Profile {"\n"}
                 in your Bookmarks
               </Text>
             </View>
