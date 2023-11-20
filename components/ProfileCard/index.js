@@ -1,8 +1,6 @@
 import React from "react";
 import { Animated, StyleSheet, View, Text } from "react-native";
-
 import { ACTION_OFFSET } from "../../utils/constants";
-
 import { Container, Image, Like, Nope } from "./styles";
 import AppIcons from "../../assets/AppIcons";
 
@@ -13,27 +11,32 @@ export default function ProfileCard({
   tiltSign,
   ...rest
 }) {
+  //* Calculate rotation based on swipe position
   const rotate = Animated.multiply(swipe.x, tiltSign).interpolate({
     inputRange: [-ACTION_OFFSET, 0, ACTION_OFFSET],
     outputRange: ["8deg", "0deg", "-8deg"],
   });
 
+  //* Calculate opacity for the "like" icon based on swipe position
   const likeOpacity = swipe.x.interpolate({
     inputRange: [10, ACTION_OFFSET],
     outputRange: [0, 1],
     extrapolate: "clamp",
   });
 
+  //* Calculate opacity for the "nope" icon based on swipe position
   const nopeOpacity = swipe.x.interpolate({
     inputRange: [-ACTION_OFFSET, -10],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
+  //* Apply styles to the card, including translation, rotation, and opacity
   const animatedCardStyle = {
     transform: [...swipe.getTranslateTransform(), { rotate: rotate }],
   };
 
+  //* Render the profile card
   return (
     <Container
       as={Animated.View}

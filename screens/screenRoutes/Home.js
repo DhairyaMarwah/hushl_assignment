@@ -18,10 +18,12 @@ export default function Home() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isMatchModalVisible, setMatchModalVisible] = useState(false);
 
+  //* PanResponder to handle user gestures
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (e, { dx, dy, y0 }) => {
+        // Set tilt sign based on card position
         tiltSign.setValue(y0 > CARD.CARD_HEIGHT / 2 ? 1 : -1);
         swipe.setValue({ x: dx, y: dy });
       },
@@ -30,12 +32,14 @@ export default function Home() {
     })
   ).current;
 
+  //* Initial setup, ensuring there are dating profiles
   useEffect(() => {
     if (datingProfiles.length === 0) {
       setdatingProfiles(datingProfilesObj);
     }
   }, [datingProfiles]);
 
+  //* Handle modal visibility timeout
   useEffect(() => {
     if (isModalVisible) {
       setTimeout(() => {
@@ -44,15 +48,18 @@ export default function Home() {
     }
   }, [isModalVisible]);
 
+  //* Check for a match and handle accordingly
   useEffect(() => {
     handleMatchCheck();
   }, [datingProfilesObj[currentProfileIndex]?.liked, currentSwipe]);
 
+  //* Handle release of the gesture
   const handlePanResponderRelease = (dx, dy) => {
     const direction = Math.sign(dx);
     const userAction = Math.abs(dx) > ACTION_OFFSET;
 
     if (userAction) {
+      //* Animate the card based on the user's swipe
       Animated.timing(swipe, {
         duration: 200,
         toValue: {
@@ -61,10 +68,12 @@ export default function Home() {
         },
         useNativeDriver: true,
       }).start(() => {
+        //* Set currentSwipe based on the direction of the swipe
         setCurrentSwipe(direction === 1 ? "liked" : "notliked");
         transitionNext();
       });
     } else {
+      //* If the swipe is not significant, spring back to the center
       Animated.spring(swipe, {
         friction: 5,
         toValue: {
@@ -76,6 +85,7 @@ export default function Home() {
     }
   };
 
+  //* Transition to the next card in the stack
   const transitionNext = useCallback(() => {
     setdatingProfiles((prevState) => {
       setCurrentProfileIndex((prevIndex) => prevIndex + 1);
@@ -84,6 +94,7 @@ export default function Home() {
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
 
+  //* Handle user's choice (like, dislike, super like)
   const handleChoise = useCallback(
     (sign) => {
       Animated.timing(swipe.x, {
@@ -95,18 +106,22 @@ export default function Home() {
     [swipe.x, transitionNext]
   );
 
+  //* Save the current profile to bookmarks
   const handleSave = () => {
     setModalVisible(true);
   };
 
+  //* Toggle match modal visibility
   const toggleMatchModal = () => {
     setMatchModalVisible(!isMatchModalVisible);
   };
 
+  //* Toggle general modal visibility
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
+  //* Check if there is a match and show the match modal
   const handleMatchCheck = () => {
     const liked = datingProfilesObj[currentProfileIndex]?.liked;
     if (liked === true && currentSwipe === "liked") {
@@ -118,12 +133,14 @@ export default function Home() {
 
   return (
     <View style={styles.HomeView}>
+      {/* Bookmark modal */}
       <BookMark
         isVisible={isModalVisible}
         toggleModal={toggleModal}
         img={datingProfilesObj[currentProfileIndex]?.bookmark}
         name={datingProfilesObj[currentProfileIndex]?.name}
       />
+      {/* Match modal */}
       {isMatchModalVisible && (
         <Match
           isVisible={isMatchModalVisible}
@@ -131,11 +148,11 @@ export default function Home() {
           img={datingProfilesObj[currentProfileIndex - 1].bookmark}
         />
       )}
-
+      {/* App logo */}
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>
-
+      {/* Container for profile cards and bottom bar   */}
       <Container>
         {datingProfiles
           .map((item, index) => {
@@ -155,6 +172,7 @@ export default function Home() {
           })
           .reverse()}
 
+        {/* Bottom navigation bar  */}
         <BottomBar handleChoise={handleChoise} handleSave={handleSave} />
       </Container>
     </View>
