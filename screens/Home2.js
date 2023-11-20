@@ -11,6 +11,7 @@ import { datingProfiles as datingProfilesObj } from "./data";
 import { Container } from "./styles";
 import Card from "../components/Card";
 import AppIcons from "../assets/AppIcons";
+import BookMark from "../modals/BookMark";
 
 export default function Home2() {
   const swipe = useRef(new Animated.ValueXY()).current;
@@ -73,6 +74,22 @@ export default function Home2() {
     },
     [swipe.x, transitionNext]
   );
+
+  const handleSave = () => {
+    setModalVisible(true);
+  };
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+  useEffect(() => {
+    if (isModalVisible) {
+      setTimeout(() => {
+        setModalVisible(false);
+      }, 3000);
+    }
+  }, [isModalVisible]);
   return (
     <View
       style={{
@@ -85,6 +102,7 @@ export default function Home2() {
         alignItems: "center",
       }}
     >
+      <BookMark isVisible={isModalVisible} toggleModal={toggleModal} />
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>
@@ -106,11 +124,6 @@ export default function Home2() {
             );
           })
           .reverse()}
-
-        {/* <Footer
-        handleLike={() => handleChoise(1)}
-        handleNo={() => handleChoise(-1)}
-      /> */}
         <View style={styles.BottomBar}>
           <View style={styles.BottomBarContainer}>
             <View style={styles.BottomBarContainerLeft}>
@@ -134,7 +147,10 @@ export default function Home2() {
               </TouchableOpacity>
             </View>
             <View style={styles.BottomBarContainerRight}>
-              <TouchableOpacity style={styles.BottomBarIcon}>
+              <TouchableOpacity
+                onPress={() => handleSave()}
+                style={styles.BottomBarIcon}
+              >
                 <AppIcons.Save />
               </TouchableOpacity>
             </View>
