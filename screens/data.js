@@ -1,7 +1,8 @@
 export const datingProfiles = [
   {
     source: require("../assets/DatingProfiles/Profile1.png"),
-    id: 1,
+    bookmark: require("../assets/DatingProfiles/Profile1Bookmark.png"),
+    id: 0,
     name: "Henna Clint",
     age: 22,
     location: "London, UK",
@@ -15,7 +16,7 @@ export const datingProfiles = [
     bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
   },
   {
-    id: 2,
+    id: 1,
     name: "Lauras Clint",
     age: 29,
     location: "California, UK",
@@ -28,9 +29,10 @@ export const datingProfiles = [
     liked: false,
     bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
     source: require("../assets/DatingProfiles/Profile2.png"),
+    bookmark: require("../assets/DatingProfiles/Profile2Bookmark.png"),
   },
   {
-    id: 3,
+    id: 2,
     name: "Henna Clint",
     age: 20,
     location: "Paris, Tokyo",
@@ -40,12 +42,13 @@ export const datingProfiles = [
     job: "Software Engineer",
     ethinity: "South Asian",
     matchPercentage: 84,
-    liked: false,
+    liked: true,
     bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
     source: require("../assets/DatingProfiles/Profile3.png"),
+    bookmark: require("../assets/DatingProfiles/Profile3Bookmark.png"),
   },
   {
-    id: 4,
+    id: 3,
     name: "Dannie Clint",
     age: 22,
     location: "London, UK",
@@ -58,9 +61,10 @@ export const datingProfiles = [
     liked: false,
     bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
     source: require("../assets/DatingProfiles/Profile4.png"),
+    bookmark: require("../assets/DatingProfiles/Profile4Bookmark.png"),
   },
   {
-    id: 5,
+    id: 4,
     name: "Henna Clint",
     age: 22,
     location: "London, UK",
@@ -73,5 +77,6 @@ export const datingProfiles = [
     liked: false,
     bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
     source: require("../assets/DatingProfiles/Profile1.png"),
+    bookmark: require("../assets/DatingProfiles/Profile1Bookmark.png"),
   },
 ];

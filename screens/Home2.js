@@ -17,6 +17,7 @@ export default function Home2() {
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [datingProfiles, setdatingProfiles] = useState(datingProfilesObj);
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
 
   useEffect(() => {
     if (datingProfiles.length === 0) {
@@ -60,7 +61,10 @@ export default function Home2() {
   ).current;
 
   const transitionNext = useCallback(() => {
-    setdatingProfiles((prevState) => prevState.slice(1));
+    setdatingProfiles((prevState) => {
+      setCurrentProfileIndex((prevIndex) => prevIndex + 1);
+      return prevState.slice(1);
+    });
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
 
@@ -90,6 +94,12 @@ export default function Home2() {
       }, 3000);
     }
   }, [isModalVisible]);
+
+  console.log(
+    "currentProfileIndex",
+    currentProfileIndex,
+    datingProfilesObj[currentProfileIndex]
+  );
   return (
     <View
       style={{
@@ -102,7 +112,13 @@ export default function Home2() {
         alignItems: "center",
       }}
     >
-      <BookMark isVisible={isModalVisible} toggleModal={toggleModal} />
+      <BookMark
+        isVisible={isModalVisible}
+        toggleModal={toggleModal}
+        img={datingProfilesObj[currentProfileIndex]?.bookmark}
+        name={datingProfilesObj[currentProfileIndex]?.name}
+        // data={datingProfiles[currentProfileIndex]}
+      />
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>

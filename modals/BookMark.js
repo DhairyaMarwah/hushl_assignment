@@ -10,8 +10,9 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import AppIcons from "../assets/AppIcons";
 
-export default function BookMark({ isVisible, toggleModal }) {
+export default function BookMark({ isVisible, toggleModal, img,name }) {
   const navigation = useNavigation();
+
   return (
     <Modal
       visible={isVisible}
@@ -23,12 +24,10 @@ export default function BookMark({ isVisible, toggleModal }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalWrap}>
             <View style={styles.modalFlex}>
-              <Image
-                source={require("../assets/Backgrounds/BookMark.png")}
-                style={styles.BookMarkImg}
-              />
+              <Image source={img} style={styles.BookMarkImg} />
               <Text style={styles.BookMarkText}>
-                Successfully saved Henna Profile {"\n"}in your Bookmarks
+                Successfully saved {name.split(" ")[0]} Profile {"\n"}
+                in your Bookmarks
               </Text>
             </View>
           </View>
