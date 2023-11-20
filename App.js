@@ -13,8 +13,6 @@ import * as Font from "expo-font";
 import Home from "./screens/Home";
 import CustomSplashScreen from "./screens/CustomSplashScreen";
 import GetStarted from "./screens/GetStarted";
-import Home2 from "./screens/Home2";
-import Match from "./screens/Match";
 const Stack = createNativeStackNavigator();
 
 const screens = [
@@ -23,8 +21,7 @@ const screens = [
     component: GetStarted,
     options: { headerShown: false },
   },
-  { name: "Home", component: Home2, options: { headerShown: false } },
-  { name: "Match", component: Match, options: { headerShown: false } },
+  { name: "Home", component: Home, options: { headerShown: false } },
 ];
 
 export default function App() {
@@ -52,7 +49,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
-    // Load fonts when the component mounts
     loadFonts();
   }, []);
 

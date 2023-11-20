@@ -1,183 +1,227 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
   Animated,
   PanResponder,
+  StyleSheet,
+  View,
+  TouchableOpacity,
 } from "react-native";
-import React, { useState, useRef, useCallback } from "react";
+import { ACTION_OFFSET, CARD } from "../utils/constants";
+import { datingProfiles as datingProfilesObj } from "./data";
+import { Container } from "./styles";
+import Card from "../components/Card";
 import AppIcons from "../assets/AppIcons";
-export default function Home() {
-  const DatingProfiles = [
-    {
-      id: 1,
-      name: "Henna Clint",
-      age: 22,
-      location: "London, UK",
-      image: require("../assets/DatingProfiles/Profile1.png"),
-      gender: "female",
-      height: "5'4",
-      education: "Bachelors in Computer Science",
-      job: "Software Engineer",
-      ethinity: "South Asian",
-      matchPercentage: 92,
-      liked: false,
-      bio: "Looking for a reason to delete this app, and hopefully, you’re it!",
-    },
-    {
-      id: 2,
-      name: "Jenna Hose",
-      age: 22,
-      location: "Paris, Tokyo",
-      image: require("../assets/DatingProfiles/Profile2.png"),
-      gender: "female",
-      height: "5'4",
-      education: "Bachelors in Computer Science",
-      job: "Software Engineer",
-      ethinity: "South Asian",
-      matchPercentage: 92,
-      liked: true,
-    },
-  ];
-  const [datingProfiles, setDatingProfiles] = useState(DatingProfiles);
-  const swipe = useRef(new Animated.ValueXY()).current;
-  const rotate = useRef(new Animated.Value(0)).current;
-  const panResponser = PanResponder.create({
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderMove: (_, { dx, dy }) => {
-      console.log("dx:" + dx + " dy:" + dy);
-      swipe.setValue({ x: dx, y: dy });
-    },
+import BookMark from "../modals/BookMark";
+import Match from "../modals/Match";
 
-    onPanResponderRelease: (_, { dx, dy }) => {
-      console.log("released:" + "dx:" + dx + " dy:" + dy);
-      let direction = Math.sign(dx);
-      let isActionActive = Math.abs(dx) > 200;
-      if (isActionActive) {
-        Animated.timing(swipe, {
-          toValue: { x: 500 * dx, y: dy },
-          useNativeDriver: true,
-          duration: 500,
-        }).start(removeCard);
-      } else {
-        Animated.spring(swipe, {
-          toValue: { x: 0, y: 0 },
-          useNativeDriver: true,
-          friction: 5,
-        }).start();
-      }
-    },
-  });
-  const removeCard = useCallback(() => {
-    setDatingProfiles((prepState) => prepState.slice(1));
+export default function Home() {
+  const swipe = useRef(new Animated.ValueXY()).current;
+  const [currentswipe, setCurrentswipe] = useState("");
+  const tiltSign = useRef(new Animated.Value(1)).current;
+  const [datingProfiles, setdatingProfiles] = useState(datingProfilesObj);
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+
+  useEffect(() => {
+    if (datingProfiles.length === 0) {
+      setdatingProfiles(datingProfilesObj);
+    }
+  }, [datingProfiles]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (e, { dx, dy, y0 }) => {
+        // 1: sentido horário | -1: sentido anti-horário
+        tiltSign.setValue(y0 > CARD.CARD_HEIGHT / 2 ? 1 : -1);
+        swipe.setValue({ x: dx, y: dy });
+      },
+      onPanResponderRelease: (e, { dx, dy }) => {
+        const direction = Math.sign(dx);
+        const userAction = Math.abs(dx) > ACTION_OFFSET;
+
+        if (userAction) {
+          Animated.timing(swipe, {
+            duration: 200,
+            toValue: {
+              x: direction * CARD.CARD_OUT_WIDTH,
+              y: dy,
+            },
+            useNativeDriver: true,
+          }).start(() => {
+            if (direction === 1) {
+              console.log("liked");
+              setCurrentswipe("liked");
+            } else {
+              console.log("not liked");
+              setCurrentswipe("notliked");
+            }
+            transitionNext();
+          });
+        } else {
+          Animated.spring(swipe, {
+            friction: 5,
+            toValue: {
+              x: 0,
+              y: 0,
+            },
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  const transitionNext = useCallback(() => {
+    setdatingProfiles((prevState) => {
+      setCurrentProfileIndex((prevIndex) => prevIndex + 1);
+      return prevState.slice(1);
+    });
     swipe.setValue({ x: 0, y: 0 });
   }, [swipe]);
 
-  const handelSelection = useCallback(
-    (direction) => {
-      Animated.timing(swipe, {
-        toValue: { x: direction * 500, y: 0 },
-        useNativeDriver: true,
+  const handleChoise = useCallback(
+    (sign) => {
+      Animated.timing(swipe.x, {
         duration: 500,
-      }).start(removeCard);
+        toValue: sign * CARD.CARD_OUT_WIDTH,
+        useNativeDriver: true,
+      }).start(transitionNext);
     },
-    [removeCard]
+    [swipe.x, transitionNext]
   );
+
+  const handleSave = () => {
+    setModalVisible(true);
+  };
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isMatchModalVisible, setMatchModalVisible] = useState(false);
+
+  const toggleMatchModal = () => {
+    setMatchModalVisible(!isMatchModalVisible);
+  };
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+  useEffect(() => {
+    if (isModalVisible) {
+      setTimeout(() => {
+        setModalVisible(false);
+      }, 3000);
+    }
+  }, [isModalVisible]);
+
+  useEffect(() => {
+    if (
+      datingProfilesObj[currentProfileIndex]?.liked === true &&
+      currentswipe === "liked"
+    ) {
+      setCurrentswipe("");
+      console.log("match with " + datingProfilesObj[currentProfileIndex]?.name);
+      setMatchModalVisible(true);
+    } else {
+      setCurrentswipe("");
+    }
+  }, [datingProfilesObj[currentProfileIndex]?.liked, currentswipe]);
+
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <BookMark
+        isVisible={isModalVisible}
+        toggleModal={toggleModal}
+        img={datingProfilesObj[currentProfileIndex]?.bookmark}
+        name={datingProfilesObj[currentProfileIndex]?.name}
+      />
+      {isMatchModalVisible && (
+        <Match
+          isVisible={isMatchModalVisible}
+          toggleModal={toggleMatchModal}
+          img={datingProfilesObj[currentProfileIndex-1].bookmark}
+        />
+      )}
+
       <View style={styles.ProfileLogo}>
         <AppIcons.Logo />
       </View>
-      {datingProfiles.map((item, index) => {
-        return (
-          <View style={styles.profileCard}>
-            <Image
-              source={item.image}
-              style={{ width: "100%", height: "100%" }}
-            />
-            <View style={styles.profileCardInfo}>
-              <View style={styles.ProfileLocation}>
-                <View style={styles.ProfileLocationIcon}>
-                  <AppIcons.Location />
-                </View>
-                <Text style={styles.ProfileLocationText}>{item.location}</Text>
-              </View>
-              <View style={styles.profileCardInfoNameFlex}>
-                <View style={styles.profileCardInfoNameFlexLeft}>
-                  <View style={styles.ProfileName}>
-                    <Text style={styles.ProfileNameText}>{item.name}</Text>
-                  </View>
-                </View>
-                <View style={styles.profileCardInfoNameFlexRight}>
-                  <View style={styles.ProfileMatchContainer}>
-                    <View style={styles.ProfileMatch}>
-                      <Text style={styles.ProfileMatchText}>
-                        {item.matchPercentage}
-                        {/* <View style={styles.ProfileMatchIcon}>
-                        <AppIcons.Percentage />
-                      </View> */}
-                      </Text>
-                      <View style={styles.ProfileMatchTextPercent}>
-                        <AppIcons.Percentage />
-                      </View>
-                    </View>
-                    <Text style={styles.ProfileMatchTextMatch}>match</Text>
-                  </View>
-                </View>
-              </View>
-              <View style={styles.profilePills}>
-                <View style={styles.profilePill}>
-                  <Text style={styles.profilePillText}> {item.gender}</Text>
-                </View>
-                <View style={styles.profilePill}>
-                  <Text style={styles.profilePillText}> {item.ethinity}</Text>
-                </View>
-                <View style={styles.profilePill}>
-                  <Text style={styles.profilePillText}>Ht. {item.height}</Text>
-                </View>
-                <View style={styles.profilePill}>
-                  <Text style={styles.profilePillText}>Age :{item.age}</Text>
-                </View>
-              </View>
-              <View style={styles.profileBio}>
-                <Text style={styles.profileBioText}>{item.bio}</Text>
-              </View>
-            </View>
-          </View>
-        );
-      })}
+      <Container>
+        {datingProfiles
+          .map((item, index) => {
+            const isFirst = index === 0;
+            const panHandlers = isFirst ? panResponder.panHandlers : {};
 
-      <View style={styles.BottomBar}>
-        <View style={styles.BottomBarContainer}>
-          <View style={styles.BottomBarContainerLeft}>
-            <View style={styles.BottomBarIcon}>
-              <AppIcons.Like />
+            return (
+              <Card
+                key={item.id}
+                item={item}
+                isFirst={isFirst}
+                swipe={swipe}
+                tiltSign={tiltSign}
+                {...panHandlers}
+              />
+            );
+          })
+          .reverse()}
+        <View style={styles.BottomBar}>
+          <View style={styles.BottomBarContainer}>
+            <View style={styles.BottomBarContainerLeft}>
+              <TouchableOpacity
+                onPress={() => handleChoise(1)}
+                style={styles.BottomBarIcon}
+              >
+                <AppIcons.Like />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleChoise(-1)}
+                style={styles.BottomBarIcon}
+              >
+                <AppIcons.Dislike />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleChoise(1)}
+                style={styles.BottomBarIcon}
+              >
+                <AppIcons.SuperLike />
+              </TouchableOpacity>
             </View>
-            <View style={styles.BottomBarIcon}>
-              <AppIcons.Dislike />
-            </View>
-            <View style={styles.BottomBarIcon}>
-              <AppIcons.SuperLike />
-            </View>
-          </View>
-          <View style={styles.BottomBarContainerRight}>
-            <View style={styles.BottomBarIcon}>
-              <AppIcons.Save />
+            <View style={styles.BottomBarContainerRight}>
+              <TouchableOpacity
+                onPress={() => handleSave()}
+                style={styles.BottomBarIcon}
+              >
+                <AppIcons.Save />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
-      </View>
+      </Container>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  ProfileLogo: {
+    position: "absolute",
+    top: 60,
+    left: 30,
+    zIndex: 1000,
+  },
   BottomBar: {
     position: "absolute",
+    // top: 90,
     bottom: 25,
     width: "100%",
     paddingHorizontal: 30,
+    zIndex: 1000,
   },
   BottomBarContainer: {
     flexDirection: "row",
@@ -198,151 +242,5 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(217, 217, 217, 0.25)",
     padding: 9,
     width: "23%",
-  },
-  ProfileMatch: {
-    flexDirection: "row",
-  },
-  ProfileMatchContainer: {
-    transform: [{ translateY: 10 }],
-  },
-  profilePills: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 10,
-    paddingTop: 15,
-    borderTopColor: "rgba(255,255,255,0.1)",
-    borderTopWidth: 1,
-  },
-  profileBioText: {
-    color: "#C8C8C8",
-    fontFamily: "aeonik-medium",
-    fontSize: 16,
-    marginTop: 13,
-    lineHeight: 17,
-  },
-  ProfileMatchTextMatch: {
-    color: "#FCFCFC",
-    transform: [
-      { translateY: -14 },
-      {
-        translateX: 3,
-      },
-    ],
-    fontFamily: "aeonik-medium",
-    fontSize: 20,
-  },
-  ProfileLogo: {
-    position: "absolute",
-    top: 60,
-    left: 30,
-    zIndex: 1000,
-  },
-  profilePill: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    paddingTop: 1,
-    borderRadius: 15,
-    borderColor: "#fff",
-    borderWidth: 1,
-  },
-  ProfileMatchTextPercent: {
-    transform: [{ translateY: 24 }],
-  },
-  profilePillText: {
-    color: "#fff",
-    fontFamily: "aeonik-medium",
-    fontSize: 14,
-  },
-
-  profileCard: {
-    position: "relative",
-  },
-  ProfileLocation: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  profileCardInfoNameFlexLeft: {
-    width: "70%",
-  },
-  ProfileMatchIcon: {
-    position: "relative",
-    // top: -40,
-    bottom: -30,
-  },
-  ProfileNameText: {
-    color: "#fff",
-    fontFamily: "aeonik-bold",
-    fontSize: 48,
-    lineHeight: 49,
-    letterSpacing: -2,
-  },
-  ProfileMatchText: {
-    color: "#fff",
-    fontFamily: "aeonik-bold",
-    fontSize: 64,
-    lineHeight: 65,
-  },
-
-  ProfileLocationText: {
-    color: "#fff",
-    fontFamily: "aeonik-medium",
-    fontSize: 14,
-
-    marginBottom: 10,
-    flexDirection: "row",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-  },
-  profileCardInfoNameFlex: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  ProfileLocationIcon: {
-    marginRight: 5,
-  },
-
-  profileCardInfo: {
-    position: "absolute",
-    bottom: 130,
-    width: "100%",
-    paddingHorizontal: 30,
-  },
-  termsContent: {
-    marginTop: 20,
-  },
-  termsTextBold: {
-    color: "#22272F",
-    fontFamily: "Poppins_600SemiBold",
-  },
-  termsText: {
-    fontSize: 14,
-    fontFamily: "Poppins_400Regular",
-    color: "#74797D",
-    lineHeight: 20,
-  },
-  pageHeader: {
-    textAlign: "center",
-    color: "#22272F",
-    fontSize: 19,
-    letterSpacing: -0.5,
-    fontFamily: "Poppins_600SemiBold",
-    marginTop: 15,
-  },
-  Container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#FFF",
-  },
-  ScrollContainer: {
-    width: "90%",
-    marginHorizontal: "auto",
-    textAlign: "center",
-    alignContent: "center",
   },
 });
