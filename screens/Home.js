@@ -8,9 +8,7 @@ import {
   PanResponder,
 } from "react-native";
 import React, { useState, useRef, useCallback } from "react";
-import TinderCard from "../components/TinderCard";
 import AppIcons from "../assets/AppIcons";
-import App from "../App";
 export default function Home() {
   const DatingProfiles = [
     {

@@ -51,7 +51,8 @@
     "react-native-screens": "^3.25.0",
     "react-native-svg": "13.9.0",
     "react-native-svg-transformer": "^1.1.0",
-    "react-native-x-carousel": "^1.0.1"
+    "react-native-x-carousel": "^1.0.1",
+    "styled-components": "5.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
