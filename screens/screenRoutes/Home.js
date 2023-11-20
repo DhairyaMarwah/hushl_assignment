@@ -10,6 +10,8 @@ import BottomBar from "../../components/BottomBar/BottomBar";
 import ProfileCard from "../../components/ProfileCard";
 
 export default function Home() {
+  
+  //* State variables
   const swipe = useRef(new Animated.ValueXY()).current;
   const tiltSign = useRef(new Animated.Value(1)).current;
   const [datingProfiles, setdatingProfiles] = useState(datingProfilesObj);
